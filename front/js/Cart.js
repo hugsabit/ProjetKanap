@@ -4,7 +4,7 @@ function saveCart(cart) {
 
 function getCart() {
     let cart = localStorage.getItem("cart");
-    if (cart == null || cart =="" ) {
+    if (cart == null || cart == "") {
         return [];
     } else {
         return JSON.parse(cart)
@@ -45,49 +45,58 @@ function removeToCard(product) {
 
 function showCart() {
     let cart = getCart();
-    console.log(cart);
-
     if (cart != undefined) {
-
         const urlFetch = 'http://localhost:3000/api/products/';
-        
           //Requete des Produits
         fetch(urlFetch)
             .then(response => response.json())
-            .then(response => {console.log(response);})
+            .then(response => {
+                for (let product of cart) {
+                    for (let i = 0; i < response.length; i++) {
+                        if (product.id === response[i]._id) {
+                            product.name = response[i].name;
+                            product.price = response[i].price;
+                            product.imageUrl = response[i].imageUrl;
+                            product.altTxt = response[i].altTxt;
+                            product.description = response[i].description;
+                        }
+                    }
+                    
+                }
+                console.log(cart);
+                show();
+            })
         .catch((erreur) => {
             console.error(`Erreur lors de la requête: ${erreur}`);
         });
 
-        cart.forEach(element => {
-            
-        });
-
-        // cart.map(product => {
-        //     document.getElementById('cart__items').innerHTML += `
-        //         <article class="cart__item" data-id="{${product.id}}" data-color="{${product.color}}">
-        //         <div class="cart__item__img">
-        //             <img src="../images/product01.jpg" alt="Photographie d'un canapé">
-        //         </div>
-        //         <div class="cart__item__content">
-        //             <div class="cart__item__content__description">
-        //                 <h2>Nom du produit</h2>
-        //                 <p>Vert</p>
-        //                 <p>42,00 €</p>
-        //             </div>
-        //             <div class="cart__item__content__settings">
-        //                 <div class="cart__item__content__settings__quantity">
-        //                     <p>Qté : </p>
-        //                     <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="42">
-        //                 </div>
-        //                 <div class="cart__item__content__settings__delete">
-        //                     <p class="deleteItem">Supprimer</p>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //         </article>`;
-
-        // });
+        function show() {
+            cart.map(product => {
+                document.getElementById('cart__items').innerHTML += `
+                    <article class="cart__item" data-id="{${product.id}}" data-color="{${product.color}}">
+                    <div class="cart__item__img">
+                        <img src="${product.imageUrl}" alt="${product.altTxt}">
+                    </div>
+                    <div class="cart__item__content">
+                        <div class="cart__item__content__description">
+                            <h2>${product.name}</h2>
+                            <p>${product.color}</p>
+                            <p>${product.price} €</p>
+                        </div>
+                        <div class="cart__item__content__settings">
+                            <div class="cart__item__content__settings__quantity">
+                                <p>Qté : ${product.quantity}</p>
+                                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.quantity}">
+                            </div>
+                            <div class="cart__item__content__settings__delete">
+                                <p class="deleteItem">Supprimer</p>
+                            </div>
+                        </div>
+                    </div>
+                    </article>
+                `;
+            });
+        }
     } else {
         console.log("fail");
     };
